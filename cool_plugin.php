@@ -9,10 +9,13 @@
 */
 
 register_activation_hook(__FILE__, 'plugin_activated');
-
 // register_deactivation_hook(__FILE__, 'plugin_deactivated');
 
 
+
+
+// HEJ JOHN! Vi flyttar över hela vår kod som gäller custom post types från functions.php under themes
+// och så gör vi såhär istället :) fråga så ska jag försöka förklara!
 function cool_plugin_setup_post_type(){
 
     register_post_type('wcm_travel', ['public' => true, 'label'  => 'WCM Travels', 'supports' => ['title', 'editor', 'thumbnail', 'custom-fields']]);
@@ -85,6 +88,10 @@ function create_sport_tax(){
         )
     );
 }
+
+
+// Här nedan testar vi lite shortcodes, sådana som vi hitta i content som såg ut typ: [wcm_travels type=travel_cup]
+// Skapa en post, exempelvis match och skriv sedan [cool_latest_matches type='travel_camp,travel_cup'] i content editorn
 
 add_shortcode('cool_latest_matches', 'cool_show_latest_matches');
 
