@@ -114,6 +114,132 @@ function cool_show_latest_matches($atts=[], $content = ""){
 
 }
 
+/**
+ * Här skapar vi en ny meny i admin.
+ */
+add_action('admin_menu', 'wcm_admin_menu');
+function wcm_admin_menu()
+{
+    add_menu_page(
+        'Cool Menu',
+        'Your Github Repos',
+        'manage_options',
+        'wcm_menu',
+        'wcm_admin_menu_page',
+        'dashicons-learn-more',
+        20
+    );
+}
+
+/* Vi har extraherat view koden för meny-sidan och inkludera det här */
+function wcm_admin_menu_page()
+{
+    include plugin_dir_path(__FILE__) . 'admin/cool_menu_page.php';
+}
+
+
+
+
+/**
+ * Lägg till settings på vår nya admin sida
+ */
+function wcm_setttings_init()
+{
+
+    register_setting('wcm_menu', 'wcm_setting_name');
+    register_setting('wcm_menu', 'wcm_setting_user');
+
+
+    /* Skapar en settings sektion */
+    add_settings_section(
+        'wcm_main_settings',
+        'WCM Inställningar',
+        'wcm_settings_sections_html',
+        'wcm_menu'
+    );
+
+    /* Skapar fält för settings */
+    add_settings_field(
+        'wcm_settings_field',
+        'API Nyckel',
+        'wcm_api_field_html',
+        'wcm_menu',
+        'wcm_main_settings'
+    );
+
+
+
+    add_settings_field(
+        'wcm_user_field',
+        'Användarnamn',
+        'wcm_username_field_html',
+        'wcm_menu',
+        'wcm_main_settings'
+
+    );
+}
+add_action('admin_init', 'wcm_setttings_init');
+
+
+
+function wcm_settings_sections_html()
+{
+    echo '<p>Fyll i din api-nyckel och användarnamn</p>';
+}
+
+
+function wcm_username_field_html(){
+
+    $user_key = get_option('wcm_setting_user');
+
+
+    $putout = '<input type="text" name="wcm_setting_user" value="';
+    $putout .= isset($user_key) ? esc_attr($user_key) : '';
+    $putout .= '" />';
+
+    echo $putout;
+}
+
+function wcm_api_field_html()
+{
+    $api_key = get_option('wcm_setting_name');
+
+
+    $output = '<input type="text" name="wcm_setting_name" value="';
+    $output .= isset($api_key) ? esc_attr($api_key) : '';
+    $output .= '" />';
+
+
+    echo $output;
+}
+
+function get_github_user_data(){
+
+    wp_remote_get('https://api.github.com/users/carljohansson1992');
+}
+
+function get_github_repos(){
+
+    $args = array(
+        'headers' => array(
+            'Accept' => 'application/json',
+            'Authorization' => 'Basic ' . base64_encode(get_option('wcm_setting_user') . ":" . get_option('wcm_setting_name'))
+        )
+        );
+
+    $githubUserRepos = get_transient('cool_github_userdata');
+    $inputUser = get_option('wcm_setting_user');
+
+    if($githubUserRepos == false){
+
+    return $githubUser = wp_remote_get('https://api.github.com/users/' . $inputUser . '/repos', $args);
+    $githubUserRepos = wp_remote_retrieve_body($githubUser);
+    set_transient('cool_github_userdata', $githubUserRepos, 60*60);
+    }
+    delete_transient('cool_github_userdata');
+
+    return json_decode($githubUserRepos, true);
+}
 
 function plugin_deactivated(){
 
