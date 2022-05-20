@@ -213,10 +213,6 @@ function wcm_api_field_html()
     echo $output;
 }
 
-function get_github_user_data(){
-
-    wp_remote_get('https://api.github.com/users/carljohansson1992');
-}
 
 function get_github_repos(){
 
@@ -230,12 +226,12 @@ function get_github_repos(){
     $githubUserRepos = get_transient('cool_github_userdata');
     $inputUser = get_option('wcm_setting_user');
 
-    if($githubUserRepos == false){
 
-    return $githubUser = wp_remote_get('https://api.github.com/users/' . $inputUser . '/repos', $args);
+
+    $githubUser = wp_remote_get('https://api.github.com/users/' . $inputUser . '/repos', $args);
     $githubUserRepos = wp_remote_retrieve_body($githubUser);
     set_transient('cool_github_userdata', $githubUserRepos, 60*60);
-    }
+
     delete_transient('cool_github_userdata');
 
     return json_decode($githubUserRepos, true);

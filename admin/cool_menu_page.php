@@ -14,7 +14,7 @@
 
     <?php $repos = get_github_repos();
 
-    echo $repos['response']['code'];
+    // echo $repos['response']['code'];
 
     if (isset($repos['message']) == 'Not Found'){
         echo '<h2>User not found</h2>';
